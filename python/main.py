@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 load_dotenv(".env")
 PROXY_URL = os.environ.get("PROXY_URL")
 
+# # Scraping without concurrency
+#
+#
 # def main():
 #     start = time.time()
 #     url = "https://en.wikipedia.org/wiki/List_of_NBA_All-Stars"
@@ -50,6 +53,9 @@ PROXY_URL = os.environ.get("PROXY_URL")
 #         thread.join()
 
 
+# Scraping with concurrency
+
+
 async def main():
     start = time.time()
     url = "https://en.wikipedia.org/wiki/List_of_NBA_All-Stars"
@@ -58,17 +64,16 @@ async def main():
     table = soup.select_one('table.wikitable.sortable')
     links = [a['href'] for a in table.select("span.fn > a")]
     print(links)
-
-    async def scrape_all_star(link):
-        async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
+        async def scrape_all_star(link, session):
             async with session.get(link, proxy=PROXY_URL) as response:
                 html_text = await response.text()
                 soup = BeautifulSoup(html_text, 'html.parser')
                 name = soup.select_one('caption').get_text() if soup.select_one('caption') else ""
                 all_labels = [td.get_text() for td in soup.select('td.infobox-data')]
                 print(name, all_labels[1], all_labels[2])
-    tasks = [scrape_all_star(f"https://en.wikipedia.org{link}") for link in links]
-    await asyncio.gather(*tasks)
+        tasks = [scrape_all_star(f"https://en.wikipedia.org{link}", session) for link in links]
+        await asyncio.gather(*tasks)
     end = time.time()
     print(f"Time taken to run the scraper: {end - start} s")
 

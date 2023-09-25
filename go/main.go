@@ -11,11 +11,16 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// // Without concurrency
 // func main() {
 // 	start := time.Now()
+// 	godotenv.Load()
+// 	var proxyURL string = os.Getenv("PROXY_URL")
+
 // 	linkCollector := colly.NewCollector(
 // 		colly.AllowedDomains("en.wikipedia.org"),
 // 	)
+// 	linkCollector.SetProxy(proxyURL)
 
 // 	allStarsCollector := linkCollector.Clone()
 
@@ -41,6 +46,7 @@ import (
 // 	log.Printf("Scraping all the NBA all stars took %s", elapsed)
 // }
 
+// With concurrency
 func main() {
 	start := time.Now()
 	godotenv.Load()
